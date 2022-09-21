@@ -61,12 +61,15 @@ router.get('/view', (req, res) => {
     
     });
 // UPDATE
-router.put('/update/:date', (req, res)=>{
+router.put('/update/:id', (req, res)=>{
     console.log(req.body);
 
     var date = req.body.date;
+    var temperature = req.body.temperature;
+    var deviceId = req.body.device_id;
+    var readingId = req.params.id;
 
-    sqlQuery = `UPDATE temp_tb SET date="${date}" WHERE id=20220001`;
+    sqlQuery = `UPDATE temp_tb SET date="${date}", temperature="${temperature}", device_id="${deviceId}" WHERE id=${readingId}`;
 
     dbConn.query(sqlQuery,  function( error, results, fields ){ 
 
@@ -96,6 +99,32 @@ router.delete('/delete/:id', (req,res)=>{
         msg:'Data Successfully Deleted',
         results:results,
        });
+    });
+});
+//SEARCH BY ID
+router.get('/search/:id', (req, res)=>{
+    console.log(req.params.id);
+    var readingId = req.params.id;
+    sqlQuery = `SELECT * FROM temp_tb WHERE id=${readingId}`;
+    dbConn.query(sqlQuery, function(error, results, fields){
+        if (error) throw error;
+        res.status(200).json({
+            msg:'Search Results:',
+            results:results,
+        });
+    });
+});
+//SEARCH BY DEVICEID USING LIKE FUNCTION
+router.get('/searchlike/:device_id', (req, res)=>{
+    console.log(req.params.device_id);
+    var deviceId = req.params.device_id;
+    sqlQuery = `SELECT * FROM temp_tb WHERE device_id LIKE "%${deviceId}%"`;
+    dbConn.query(sqlQuery, function(error, results, fields){
+        if (error) throw error;
+        res.status(200).json({
+            msg:'Search Results:',
+            results:results,
+        });
     });
 });
 module.exports = router;
